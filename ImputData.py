@@ -26,19 +26,16 @@ def check_silent(val):
     return status
 
 def getInputaData(fo, mcep):
+    length = len(fo) - 4
+
     mcep_array = np.zeros((5, 39))
     fo_array = np.zeros(5)
 
-    mcep_array[2, :] = mcep[0, 1:40]
-    mcep_array[3, :] = mcep[1, 1:40]
-    mcep_array[4, :] = mcep[2, 1:40]
+    for i in range(5):
+        mcep_array[i, :] = mcep[i, 1:40]
+        fo_array[i] = check_silent(fo[i])       # check silent
     mcep_array_std = standardization(mcep_array)
     mcep_array_std_flat = mcep_array_std.flatten()
-
-    # check silent
-    fo_array[2] = check_silent(fo[0])
-    fo_array[3] = check_silent(fo[1])
-    fo_array[4] = check_silent(fo[2])
 
     return mcep_array_std_flat, fo_array
 
