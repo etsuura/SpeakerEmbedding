@@ -4,7 +4,7 @@ import pysptk
 import pyworld as pw
 
 from utils import SignalProcessingTools as spt
-from utils import PlotFigure as pf
+# from utils import PlotFigure as pf
 
 def read_audio(FilePath):
     data, fs = spt.read_data(FilePath)
@@ -25,28 +25,35 @@ def check_silent(val):
         status = 0
     return status
 
-def getInputaData(fo, mcep):
+def calcData(fo, mcep):
     length = len(fo) - 4
+    mecp_array_all = np.zeros((length, 195))
+    fo_array_all = np.zeros((length, 5))
 
     mcep_array = np.zeros((5, 39))
     fo_array = np.zeros(5)
 
-    for i in range(5):
-        mcep_array[i, :] = mcep[i, 1:40]
-        fo_array[i] = check_silent(fo[i])       # check silent
-    mcep_array_std = standardization(mcep_array)
-    mcep_array_std_flat = mcep_array_std.flatten()
+    for j in range(length):
+        for i in range(5):
+            mcep_array[i, :] = mcep[i+j, 1:40]
+            fo_array[i] = check_silent(fo[i+j])       # check silent
+        mcep_array_std = standardization(mcep_array)
+        mcep_array_std_flat = mcep_array_std.flatten()
+        mecp_array_all[j, :] = mcep_array_std_flat
+        fo_array_all[j, :] = fo_array
 
-    return mcep_array_std_flat, fo_array
+    return mecp_array_all, fo_array_all
 
-# def plotParam(fo, mcep):
-#     pf.plot_1figure(fo)
-#     # pf.save_animation(mcep)
+def getInputData(Filepath):
+    fo, mcep = read_audio(FilePath)
+    mcep_array, fo_array = calcData(fo, mcep)
+
+    return mcep_array, fo_array
 
 
 if __name__ == '__main__':
     FilePath = "./Data/jvs001/VOICEACTRESS100_001.wav"
 
-    fo, mcep = read_audio(FilePath)
-    getInputaData(fo, mcep)
-    # plotParam(fo, mcep)
+    mcep_array, fo_array = getInputData(FilePath)
+
+    pass
